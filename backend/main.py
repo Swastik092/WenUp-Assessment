@@ -2,6 +2,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from backend.api.routes import router
 
 logging.basicConfig(level=logging.INFO)
@@ -35,3 +36,6 @@ async def global_exception_handler(request: Request, exc: Exception):
             }
         }
     )
+
+# Order matters: mount after all /api/... routes
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")

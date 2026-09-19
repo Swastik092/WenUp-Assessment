@@ -6,14 +6,9 @@ from backend.models.state import PersonalWishesState
 
 router = APIRouter()
 
-from backend.config import settings
+from backend.config import get_llm_client
 
-# If no real API key is provided, fallback to MockLLMService to allow the manual demo path to work.
-if settings.llm_api_key == "mock-api-key":
-    llm_service_instance = MockLLMService()
-else:
-    llm_service_instance = OpenAILLMService()
-    
+llm_service_instance = get_llm_client()
 conversation_service_instance = ConversationService(llm_service_instance)
 
 def get_conversation_service() -> ConversationService:

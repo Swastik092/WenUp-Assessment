@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Wishes Document Intake</title>
+    <link rel="stylesheet" href="styles.css?v=4">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div id="error-banner" class="hidden">
+        <span id="error-message">Something went wrong — please try again.</span>
+        <button id="dismiss-error">&times;</button>
+    </div>
+
+    <div class="app-container">
+        <!-- Left Column: Chat -->
+        <div class="panel chat-panel">
+            <div class="panel-header">
+                <h2>Intake Assistant</h2>
+                <button id="restart-btn" class="btn-outline">Restart Session</button>
+            </div>
+            <div id="chat-log" class="chat-log">
+                <!-- Chat messages will appear here -->
+            </div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
+                <button id="send-btn" class="btn-primary">Send</button>
+            </div>
+        </div>
+
+        <!-- Right Column: State & Document -->
+        <div class="right-column">
+            <!-- Top Right: State -->
+            <div class="panel state-panel">
+                <div class="panel-header">
+                    <h3>Structured Data</h3>
+                </div>
+                <div id="state-display" class="state-display">
+                    <!-- State will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Bottom Right: Document -->
+            <div class="panel doc-panel">
+                <div class="panel-header">
+                    <h3>Draft Document</h3>
+                </div>
+                <div id="document-display" class="document-display">
+                    <!-- Document text will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js?v=4"></script>
+</body>
+</html>

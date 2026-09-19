@@ -49,6 +49,40 @@ class OpenAILLMService(BaseLLMService):
             raise ValueError(f"LLM API Error: {str(e)}")
 
 
+class GroqLLMService(BaseLLMService):
+    def __init__(self, api_key: str, model: str):
+        self.client = AsyncOpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
+        self.model = model
+
+    async def extract_information(
+        self, state: PersonalWishesState, user_message: str, history: list[dict]
+    ) -> LLMExtractionResult:
+        schema = LLMExtractionResult.model_json_schema()
+        system_content = (
+            EXTRACTION_SYSTEM_PROMPT 
+            + f"\n\nCURRENT CONFIRMED STATE:\n{state.model_dump_json(indent=2)}"
+            + f"\n\nIMPORTANT: You must return ONLY valid JSON matching this schema:\n{json.dumps(schema)}"
+        )
+        
+        messages = [{"role": "system", "content": system_content}]
+        for msg in history[-5:]:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+            
+        messages.append({"role": "user", "content": user_message})
+
+        try:
+            completion = await self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                response_format={"type": "json_object"},
+                temperature=0.0,
+            )
+            raw_content = completion.choices[0].message.content
+            return LLMExtractionResult.model_validate_json(raw_content)
+        except Exception as e:
+            raise ValueError(f"Groq API Error: {str(e)}")
+
+
 class MockLLMService(BaseLLMService):
     def __init__(self):
         self.next_response: LLMExtractionResult | None = None

@@ -49,3 +49,31 @@ async def test_malformed_retry_fallback():
     assert res["state"] == initial_state
     assert res["assistant_message"] == "Sorry, I didn't quite catch that \u2014 could you rephrase?"
     assert mock_llm.call_count == 2
+
+@pytest.mark.asyncio
+async def test_orchestrator_retry_with_gemini_client():
+    from backend.services.gemini_client import GeminiLLMService
+    from unittest.mock import AsyncMock, patch
+    
+    # Create a real conversation service, but inject a mocked Gemini client
+    mock_gemini = GeminiLLMService(api_key="fake")
+    
+    # Setup the mock to fail on the first call, and succeed on the second
+    mock_gemini.extract_information = AsyncMock(
+        side_effect=[
+            ConnectionError("Network timeout on first try"),
+            LLMExtractionResult(extractions=[
+                FieldExtraction(field="full_name", value="Retry Success", status="confirmed")
+            ])
+        ]
+    )
+    
+    conv_service = ConversationService(mock_gemini)
+    session_id = conv_service.create_session()
+    
+    res = await conv_service.process_message(session_id, "Hello")
+    
+    # Assert that it succeeded because the orchestrator caught the ConnectionError and retried
+    assert res["status"] == "success"
+    assert res["state"]["full_name"] == "Retry Success"
+    assert mock_gemini.extract_information.call_count == 2
