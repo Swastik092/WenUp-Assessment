@@ -44,3 +44,15 @@ The default frontend layout was functional but lacked the "wow" factor required 
 * **UI Redesign**: I completely overhauled `styles.css` into a premium 2-column dark-mode dashboard featuring a responsive flex layout, custom `Inter` typography, and soft borders.
 * **Markdown Parsing**: I integrated `marked.js` via CDN to parse the LLM's raw markdown response on the client side, rendering native HTML bold tags, bulleted lists, and headers seamlessly.
 * **Cache Busting**: To solve persistent browser-caching issues during the UI update, I appended version query strings (`?v=4`) to the CSS and JS imports.
+
+---
+
+## Future Production Improvements
+
+If this application were to be scaled for a production environment, I would implement the following improvements:
+
+1. **Persistent Storage (Database)**: Move away from the in-memory `dict` session store and integrate a robust database (e.g., PostgreSQL or MongoDB) via an ORM like SQLAlchemy to ensure sessions persist across server restarts and scale across multiple backend workers.
+2. **WebSocket Streaming**: Replace the REST POST `/api/chat` endpoint with WebSockets to stream the LLM's response tokens in real-time. This provides a smoother, more interactive UX (the "typing" effect) rather than blocking the UI while waiting for the entire generation to complete.
+3. **Authentication & Security**: Implement JWT-based user authentication to securely associate Document Intake sessions with specific user accounts, ensuring strict privacy and data isolation for sensitive legal information.
+4. **Enterprise LLM Tiers & Fallbacks**: Transition from Free Tier APIs to Enterprise tiers to eliminate rate-limiting bottlenecks. Additionally, implement an advanced LLM router (e.g., LiteLLM) to automatically failover between providers (e.g., OpenAI -> Anthropic -> Groq) if an outage occurs.
+5. **Observability and Telemetry**: Integrate tools like Datadog, Sentry, or LangSmith to monitor LLM token usage, prompt latency, and pipeline execution errors to rapidly debug extraction failures in the wild.
